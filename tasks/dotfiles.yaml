@@ -1,0 +1,28 @@
+- name: Install Stow
+  become: true
+  community.general.pacman:
+    name: stow
+    state: present
+
+- name: Clone Dotfiles
+  ansible.builtin.git:
+    repo: 'http://github.com/cordcivilian/.dotfiles.git'
+    dest: "{{ lookup('env', 'HOME') }}/.dotfiles"
+    recursive: yes
+    update: yes
+    accept_hostkey: yes
+    version: main
+
+- name: Remove default .bashrc
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.bashrc"
+    state: absent
+
+- name: Stow Dotfiles
+  shell: cd "{{ lookup('env', 'HOME') }}/.dotfiles" && ./archway
+
+- name: Stow Dotfiles (arch13)
+  shell: cd "{{ lookup('env', 'HOME') }}/.dotfiles" && ./archway13
+  tags:
+    - arch13
+
